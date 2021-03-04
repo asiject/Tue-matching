@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-XSS-Protection" content="1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <title>Matching Test Ver 0</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style type="text/css">
+    #app{
+        width: fit-content;
+        height: 200px;
+        margin: 0 auto;
+        clear: both;
+    }
+    ol{
+        width: 450px;
+    }
+    li{
+        width: 80px;
+        height: 20px;
+        margin-right: 10px;
+        float: left;
+    }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <ol>
+            <li v-for="name in people">{{name}}</li>
+        </ol>
+    </div>
+    <br />
+    <div>
+        <input type="text" placeholder="이름" id="input_add" />
+        <button id="add">이름 추가</button>
+        <br />
+        <input type="text" placeholder="이름" id="input_delete" />
+        <button id="delete">이름 삭제</button>
+    </div>
+    <hr />
+    <button onClick="init()">초기화</button>
+    <br />
+    <button onClick="sort_count()">정렬 테스트</button>
+    <button onClick="test()">테스트</button>
+    <br />
+    <button onClick="countCheck()">카운트 체크</button>
+    <button onClick="countCheck0()">카운트0 체크</button>
+    <br />
+
+
+    <div id="area"></div>
+
+    <script>
+        $(document).ready(function(){
+            $('#add').click(function(){
+                if($("#input_add").val() != ""){
+                    app.people.push($("#input_add").val());
+                }
+                $("#input_add").val("");
+            })
+            $('#delete').click(function(){
+                if($("#input_delete").val() != ""){
+                    const index = app.people.indexOf($("#input_delete").val());
+                    console.log(index);
+                    // 값을 못 찾으면 index 에는 -1 반환, 배열의 마지막부터 splice할 수 있으므로 -1를 제외한다.
+                    if(index != -1){
+                        app.people.splice(index,1);
+                    }
+                }
+                $("#input_delete").val("");
+            })
+        });
+        var app = new Vue({
+            el: '#app',
+            data: {
+                people : [
+                '강다은', '고우중', '김문주', '김상일', '김원진',
+                '김현아', '박경원', '박유정', '변성우', '서의원',
+                '서정한', '송충용', '양은선', '양요열', '오경수',
+                '이가현', '이사무엘', '이은평', '이주헌', '이화선',
+                '이효성', '정성진', '최진일', '한민구', '황미라',
+                '황애리',
+                ],
+            },
+            methods: {
+                init: function(){
+
+                }
+            }
+        });
+        let countArray = []; // count가 얼마나 쌓였는지 확인하는 data/array
+        let group = []; // 출력할 그룹
+        let name = ['이사무엘','이효성','한민구','서정한', '강다은', '박유정', '양은선', '서의원', '황미라', '양요열', '고우중', '김문주', '김상일', '김원진', '박경원', '변성우',  '오경수', '이가현', '이은평', '이주헌', '이화선', '정성진', '최진일', '황애리', '송충용', '김현아'];
+        // '장영준', '정서연',
+        // '박금비', '조은주',
+        let removeGroup = [ // 만나지 않을 그룹(이름 오름차순)
+            "박경원:오경수",
+        ];
+        function init(){
+            countArray = []; // 초기화
+            name.sort(); // 이름 정렬
+            console.log(name);
+            var text = '';
+            for(i = 0; i < name.length; i++){
+                for(let j = i+1; j < name.length; j++){
+                    text = name[i] + ':' + name[j];
+                    countArray.push({'key':text, 'count':0});
+                }
+            }
+            countArray.sort();
+            remove();
+            console.log(countArray);
+        }
+
+        function shuffle(arr){
+            for(let i = arr.length - 1; i > 0; i--){
+                let j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+        function sort_count(){
+            //count를 기준으로 정렬
+            countArray = countArray.sort(function(a,b){
+                if(a.count > b.count){
+                    return 1;
+                }
+                else{
+                    return -1;
+                }
+            });
+        }
+        function sort_key(){
+            //key를 기준으로 정렬
+            countArray = countArray.sort(function(a,b){
+                if(a.key > b.key){
+                    return 1;
+                }
+                else{
+                    return -1;
+                }
+            });
+        }
+        function test(){
+            shuffle(countArray);
+            sort_count();
+            let str = '';
+            let a;
+            let b;
+
+            for(let i = 0; i < countArray.length; i++){
+                str = countArray[i].key.split(':');
+                a = group.filter(something => something == str[0]).length;
+                b = group.filter(something => something == str[1]).length;
+                // 둘다 처음 나옴
+                if((a == 0)&&(b == 0)){
+                    group.push(str[0]);
+                    group.push(str[1]);
+                }
+                // 둘 중 하나는 나옴
+                else if((a == 0)&&(b == 1)){
+                    group.splice(group.indexOf(str[1]), 0, str[0]);
+                }
+                else if((a == 1)&&(b == 0)){
+                    group.splice(group.indexOf(str[0]), 0, str[1]);
+                }
+            }
+            console.log(group);
+
+            let size;
+            let p = [];
+            let temp = '';
+            let test;
+            if(group.length / 3 == 0){
+                size = parseInt(group.length / 3);
+            }else{
+                size = parseInt((group.length / 3) + 1);
+            }
+            console.log('size : ' + size);
+            for(let i = 1; i <= size; i++){
+                $("#area").append("<p class='group'></p>");
+                //출력할 태그 생성
+                for(let j = 0; j < 3; j++){
+                    if(group.length){
+                        p.push(group.shift());
+                    }
+                }
+                $('.group:nth-child('+i+')').text(p);
+                p.sort();
+                for(let j = 0; j<3; j++){
+                    for(let k = j+1; k<p.length;k++){
+                        temp = p[j] + ':' + p[k];
+                        countArray[countArray.findIndex((a) => a.key == temp)].count++;
+                    }
+                }
+                p = [];
+                // 출력한 배열 초기화
+            }
+        }
+
+        function remove(){
+            for(let i = 0; i < removeGroup.length; i++){
+                countArray.splice(countArray.findIndex((a) => a.key == removeGroup[i]),1);
+            }
+        }
+        function countCheck(){
+            for(let i = 0; i<countArray.length; i++){
+                console.log(countArray[i]);
+            }
+        }
+        function countCheck0(){
+            for(let i = 0; i<countArray.length; i++){
+                if(countArray[i].count == 0){
+                    console.log(countArray[i]);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
