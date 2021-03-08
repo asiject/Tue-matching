@@ -220,6 +220,7 @@
         })*/
         .then(({data})=>{
             matchScope.groupList = data.groupList;
+            $("#girdDiv").html('');
             for(let i=0;i<data.groupList.length;i++) {
                 console.log('data.groupList[i] >', data.groupList[i])
                 for(let j=0;j<data.groupList[i].length;j++) {
