@@ -7,9 +7,6 @@ module.exports = (sequelize, DataTypes) => {
                 autoIncrement: true,
                 primaryKey: true,
             },
-            sortno: {
-                type: DataTypes.INTEGER.UNSIGNED,
-            },
             name: {
                 type: DataTypes.STRING(10),
                 // allowNull: false,

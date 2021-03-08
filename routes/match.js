@@ -37,7 +37,7 @@ router.post("/match/count", async (req, res) => {
         const inB = tmpList && `and bname in (${tmpList})`;
 
         const records = await models.sequelize.query(
-            `SELECT NAME, 0 COUNT, ifnull(usr.sortno,0) usr.num, updatedat
+            `SELECT NAME, 0 COUNT, usr.num, updatedat
             FROM match_users usr
             WHERE name NOT in (
                 SELECT bname
@@ -50,7 +50,7 @@ router.post("/match/count", async (req, res) => {
 
             UNION 
 
-            SELECT bname, COUNT , ifnull(usr.sortno,0) usr.num, cnt.updatedat
+            SELECT bname, COUNT , usr.num, cnt.updatedat
             FROM match_users usr, match_counts cnt
             WHERE aname = '${name}'
             AND usr.name = cnt.aname
