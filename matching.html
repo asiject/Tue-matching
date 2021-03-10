@@ -2,221 +2,235 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <meta http-equiv="X-XSS-Protection" content="1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
-    <title>Matching Test Ver 0</title>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>Matching Ver 0.9</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
     <style type="text/css">
-    #app{
-        width: fit-content;
-        height: 200px;
-        margin: 0 auto;
-        clear: both;
-    }
-    ol{
-        width: 450px;
-    }
-    li{
-        width: 80px;
-        height: 20px;
-        margin-right: 10px;
-        float: left;
-    }
+        .grid {
+            text-align: center;
+            display: grid;
+            grid-template: 30px / 70px 70px 70px;
+            grid-gap: 10px;
+            background-color: #ffffff;
+            padding: 10px;
+        }    
+        .block {
+            height: 30px;
+            width: 70px; 
+            border: 1px solid;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+        }    
+         .wrapper {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .selectbox, .resultTab, .btnBox {
+            width: 400px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        .selectbox {
+            margin-left: 410px;
+            margin-top: 25px;
+        }
+        .resultTab {
+            margin-top: 15px;
+        }
+        .btnBox {
+            width: 300px;
+            margin-bottom: 5px;
+        }
+        .sample {
+            width: 250px;
+            margin: 0 auto;
+        }
+
+        hr {
+            width: 500px;
+        }
     </style>
 </head>
 <body>
-    <div id="app">
-        <ol>
-            <li v-for="name in people">{{name}}</li>
-        </ol>
+    <div class="container">
+        <div class="wrapper">
+            <div class="selectbox">
+                <div>
+                    <label><input type="checkbox" id="allCheck" onclick="toggleChk(this)">전체선택</label>
+                </div>
+            </div>
+            <hr>
+            <div class="btnBox input-group">
+                <input class="form-control" id="addUser" name="addUser" type="text" placeholder="사용자명" onkeyup="onEnter(this);">
+                <div class="input-group-append">
+                    <button class="btn btn-dark" onclick="addUser()">추가</button>
+                </div>
+            </div>
+            <div class="btnBox input-group">
+                <input class="form-control" id="delUser" name="delUser" type="text" placeholder="사용자명" onkeyup="onEnter(this);">
+                <div class="input-group-append">
+                    <button class="btn btn-dark" onclick="delUser()">삭제</button>
+                </div>
+            </div>
+            <div class="btnBox">
+                <button onclick="dateMatch()" class="btn btn-dark" style="width: 100%;">데이트 매치</button>
+            </div>
+
+            <div id="resultTab"></div>
+            <div class='sample'>
+                <div id="girdDiv" class="grid"></div>
+            </div>
+
+        </div>
     </div>
-    <br />
-    <div>
-        <input type="text" placeholder="이름" id="input_add" />
-        <button id="add">이름 추가</button>
-        <br />
-        <input type="text" placeholder="이름" id="input_delete" />
-        <button id="delete">이름 삭제</button>
-    </div>
-    <hr />
-    <button onClick="init()">초기화</button>
-    <br />
-    <button onClick="sort_count()">정렬 테스트</button>
-    <button onClick="test()">테스트</button>
-    <br />
-    <button onClick="countCheck()">카운트 체크</button>
-    <button onClick="countCheck0()">카운트0 체크</button>
-    <br />
-
-
-    <div id="area"></div>
-
-    <script>
-        $(document).ready(function(){
-            $('#add').click(function(){
-                if($("#input_add").val() != ""){
-                    app.people.push($("#input_add").val());
-                }
-                $("#input_add").val("");
-            })
-            $('#delete').click(function(){
-                if($("#input_delete").val() != ""){
-                    const index = app.people.indexOf($("#input_delete").val());
-                    console.log(index);
-                    // 값을 못 찾으면 index 에는 -1 반환, 배열의 마지막부터 splice할 수 있으므로 -1를 제외한다.
-                    if(index != -1){
-                        app.people.splice(index,1);
-                    }
-                }
-                $("#input_delete").val("");
-            })
-        });
-        var app = new Vue({
-            el: '#app',
-            data: {
-                people : [
-                '강다은', '고우중', '김문주', '김상일', '김원진',
-                '김현아', '박경원', '박유정', '변성우', '서의원',
-                '서정한', '송충용', '양은선', '양요열', '오경수',
-                '이가현', '이사무엘', '이은평', '이주헌', '이화선',
-                '이효성', '정성진', '최진일', '한민구', '황미라',
-                '황애리',
-                ],
-            },
-            methods: {
-                init: function(){
-
-                }
-            }
-        });
-        let countArray = []; // count가 얼마나 쌓였는지 확인하는 data/array
-        let group = []; // 출력할 그룹
-        let name = ['이사무엘','이효성','한민구','서정한', '강다은', '박유정', '양은선', '서의원', '황미라', '양요열', '고우중', '김문주', '김상일', '김원진', '박경원', '변성우',  '오경수', '이가현', '이은평', '이주헌', '이화선', '정성진', '최진일', '황애리', '송충용', '김현아'];
-        // '장영준', '정서연',
-        // '박금비', '조은주',
-        let removeGroup = [ // 만나지 않을 그룹(이름 오름차순)
-            "박경원:오경수",
-        ];
-        function init(){
-            countArray = []; // 초기화
-            name.sort(); // 이름 정렬
-            console.log(name);
-            var text = '';
-            for(i = 0; i < name.length; i++){
-                for(let j = i+1; j < name.length; j++){
-                    text = name[i] + ':' + name[j];
-                    countArray.push({'key':text, 'count':0});
-                }
-            }
-            countArray.sort();
-            remove();
-            console.log(countArray);
-        }
-
-        function shuffle(arr){
-            for(let i = arr.length - 1; i > 0; i--){
-                let j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-        }
-        function sort_count(){
-            //count를 기준으로 정렬
-            countArray = countArray.sort(function(a,b){
-                if(a.count > b.count){
-                    return 1;
-                }
-                else{
-                    return -1;
-                }
-            });
-        }
-        function sort_key(){
-            //key를 기준으로 정렬
-            countArray = countArray.sort(function(a,b){
-                if(a.key > b.key){
-                    return 1;
-                }
-                else{
-                    return -1;
-                }
-            });
-        }
-        function test(){
-            shuffle(countArray);
-            sort_count();
-            let str = '';
-            let a;
-            let b;
-
-            for(let i = 0; i < countArray.length; i++){
-                str = countArray[i].key.split(':');
-                a = group.filter(something => something == str[0]).length;
-                b = group.filter(something => something == str[1]).length;
-                // 둘다 처음 나옴
-                if((a == 0)&&(b == 0)){
-                    group.push(str[0]);
-                    group.push(str[1]);
-                }
-                // 둘 중 하나는 나옴
-                else if((a == 0)&&(b == 1)){
-                    group.splice(group.indexOf(str[1]), 0, str[0]);
-                }
-                else if((a == 1)&&(b == 0)){
-                    group.splice(group.indexOf(str[0]), 0, str[1]);
-                }
-            }
-            console.log(group);
-
-            let size;
-            let p = [];
-            let temp = '';
-            let test;
-            if(group.length / 3 == 0){
-                size = parseInt(group.length / 3);
-            }else{
-                size = parseInt((group.length / 3) + 1);
-            }
-            console.log('size : ' + size);
-            for(let i = 1; i <= size; i++){
-                $("#area").append("<p class='group'></p>");
-                //출력할 태그 생성
-                for(let j = 0; j < 3; j++){
-                    if(group.length){
-                        p.push(group.shift());
-                    }
-                }
-                $('.group:nth-child('+i+')').text(p);
-                p.sort();
-                for(let j = 0; j<3; j++){
-                    for(let k = j+1; k<p.length;k++){
-                        temp = p[j] + ':' + p[k];
-                        countArray[countArray.findIndex((a) => a.key == temp)].count++;
-                    }
-                }
-                p = [];
-                // 출력한 배열 초기화
-            }
-        }
-
-        function remove(){
-            for(let i = 0; i < removeGroup.length; i++){
-                countArray.splice(countArray.findIndex((a) => a.key == removeGroup[i]),1);
-            }
-        }
-        function countCheck(){
-            for(let i = 0; i<countArray.length; i++){
-                console.log(countArray[i]);
-            }
-        }
-        function countCheck0(){
-            for(let i = 0; i<countArray.length; i++){
-                if(countArray[i].count == 0){
-                    console.log(countArray[i]);
-                }
-            }
-        }
-    </script>
 </body>
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript">
+
+    let matchScope = {
+        userList : {},
+        groupList:[]
+    }
+
+    $(document).ready(function() {
+        axios.get('http://127.0.0.1:3000/api/match/users')
+        .then(({data})=>{
+            const list = data.userList;
+            matchScope.userList = list;
+            list.forEach((v,i)=>{
+                if(v) {
+                    const name = v.name;
+                    if(i!=0 && i%4==0) {
+                        $(".selectbox").append("<br>")
+                    }
+                    $(".selectbox").append(`<label id='${name}'><input type='checkbox' id='chk_${name}' name='users' value='${name}'>${name}</input>&nbsp;</label>`)
+                }
+            })
+            //allBtnCheck 가능하면 체크
+            allBtnCheck();
+        })
+
+        $(".selectbox").on("click","input[name=users]",function() {
+            allBtnCheck();
+        })
+
+        $("#addUser").focus();
+    })
+
+    function allBtnCheck() {
+        let len = $("input[name=users]").length;
+            let checkedLen = $("input[name=users]:checked").length;
+            if(len===checkedLen) {
+                $("#allCheck").prop("checked",true);
+            }else {
+                $("#allCheck").prop("checked",false);
+            }
+
+    }
+
+    function toggleChk(obj){
+        $("input[name=users]").prop("checked",$(obj).is(":checked"))
+    }
+    function onEnter($obj) {
+        if(window.event.keyCode == 13 && $obj) {
+            if("addUser"== ($obj.id)) {
+                addUser($obj.value);
+            }else if("delUser"== ($obj.id)) {
+                delUser($obj.value);
+            }
+        }
+    }
+
+    function addUser(val) {
+        const name = val || $("#addUser").val();
+        if(name) {
+            axios.post('http://127.0.0.1:3000/api/match/user',{name:name})
+            .then(({data})=>{
+                if(data.status==200) {
+                    //기존방식 두고 변경할것도 고민필요
+                    /*
+                    $(".selectbox").append(`&nbsp;<label id='${data.user.name}'><input type='checkbox' id='chk_${data.user.name}' name='users' value='${data.user.name}' checked>${data.user.name}</input></label>`)
+                    console.log('data.user >>', data.user)
+                    matchScope.userList.push(data.user);
+                    $("#addUser").val('');
+                    */
+                    location.reload();
+
+                }else if(data.status==500){
+                    alert('이미 등록된 사용자입니다. '+name);
+                }
+            }).catch((err)=>{
+                console.log('err >> ', err);
+            })
+        }
+    }
+
+    function delUser(val) {
+        const name = val || $("#delUser").val();
+        console.log('delUser > ', name);
+        if(name) {
+            const len = matchScope.userList.length;
+            axios.delete(`http://127.0.0.1:3000/api/match/user?name=${name}`).then(({data})=>{
+                const idx = data.idx;
+                if(idx>=0) {
+                    /*
+                    matchScope.userList = [...matchScope.userList.splice(0, idx), ...matchScope.userList.splice(idx, len)];
+                    $(`#${name}`).remove();
+                    $("#delUser").val('');
+                    */
+                    location.reload();
+                }else {
+                    alert('사용자가 없습니다.')
+                    $("#delUser").val('');
+                }
+            });
+        }
+    }
+
+    function dateMatch() {
+        let arr = [];
+        let chkLen = $("input[name=users]:checked").length;
+        if(chkLen==0) {
+            alert('사용자를 선택해주세요.');
+            return;
+        }
+        $("input[name=users]:checked").each((idx,obj)=>{
+            arr.push($(obj).val());
+        });
+
+        axios.post('http://127.0.0.1:3000/api/match/count',{userList : arr})
+        /*.then(({data})=>{
+            matchScope.groupList = data.groupList;
+            $("#resultTab").append(`<div>${data.groupList.join('<br>').toString()}</div>`)
+            //console.log('data >>',data.groupList)
+        })*/
+        .then(({data})=>{
+            matchScope.groupList = data.groupList;
+            $("#girdDiv").html('');
+            for(let i=0;i<data.groupList.length;i++) {
+                console.log('data.groupList[i] >', data.groupList[i])
+                for(let j=0;j<data.groupList[i].length;j++) {
+                    $("#girdDiv").append(`<div class='block'>${data.groupList[i][j]}</div>`)
+                }
+
+            }
+            //console.log('data >>',data.groupList)
+        })
+
+    }
+</script>
 </html>
